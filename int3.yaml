@@ -1,0 +1,516 @@
+# Integrated Zone Economy - STABILITY FOCUSED Configuration
+# Goal: Self-sufficient system where NPCs survive consistently across all territories
+
+display:
+  width: 1400
+  height: 900
+  fps: 60
+
+colors:
+  BLACK: [0, 0, 0]
+  WHITE: [255, 255, 255]
+  TEAL: [26, 153, 153]
+  ORANGE: [204, 136, 68]
+  RED_ORANGE: [255, 107, 74]
+  GREEN: [45, 122, 45]
+  LIME: [100, 255, 100]
+  GREEN_TEXT: [0, 170, 0]
+  RED_TEXT: [200, 50, 50]
+  YELLOW_TEXT: [220, 200, 100]
+  TRADE_COLOR: [200, 180, 100]
+  DEV_COLOR: [100, 150, 200]
+  FLEX_COLOR: [200, 100, 100]
+
+fonts:
+  header: 38
+  large: 55
+  small: 27
+  tiny: 21
+
+zones:
+  - name: "SCIENCE"
+    color: "TEAL"
+    angle: 0
+    description: "Learning & Discovery"
+    npc_count: 10
+  
+  - name: "TRADE"
+    color: "TRADE_COLOR"
+    angle: 1.5708  # pi/2
+    description: "Exchange & Value"
+    npc_count: 10
+  
+  - name: "DEVELOPMENT"
+    color: "DEV_COLOR"
+    angle: 3.14159  # pi
+    description: "Production & Stability"
+    npc_count: 15 # More farmers for food security
+  
+  - name: "FLEX"
+    color: "FLEX_COLOR"
+    angle: 4.71239  # 3*pi/2
+    description: "Innovation & Risk"
+    npc_count: 10
+
+events:
+  probability: 0.02  # Reduced from 0.03 - less chaos for stability testing
+  
+  list:
+    - name: "Drought"
+      zone: "DEVELOPMENT"
+      duration: 8  # Shorter duration
+      effect:
+        production: -0.3  # Less severe
+        integrity: -10
+    
+    - name: "Market Crash"
+      zone: "TRADE"
+      duration: 6
+      effect:
+        price: 1.3  # Less extreme
+        mood: -0.15
+    
+    - name: "Breakthrough"
+      zone: "SCIENCE"
+      duration: 5
+      effect:
+        learning: 1.5
+        status: 0.2
+    
+    - name: "Chaos"
+      zone: "FLEX"
+      duration: 10
+      effect:
+        randomness: 1.5
+        integrity: -8
+    
+    - name: "Abundance"
+      zone: "DEVELOPMENT"
+      duration: 12
+      effect:
+        production: 1.5  # Less extreme boost
+        mood: 0.1
+
+personality:
+  industrious: [-0.3, 1.0]  # More industrious overall
+  greedy: [-0.5, 0.6]       # Less greedy
+  social: [-0.2, 1.0]
+  ambitious: [-0.2, 0.8]    # Less ambitious competition
+  risk_tolerance: [0.2, 0.8]
+
+npc_initial:
+  basic_needs: 15.0   # Start with more food
+  money: 20.0         # Start with more money
+  knowledge: 0.0
+  influence: 0.0
+  mood: 0.7           # Start happier
+  health: 1.0
+  energy: 100.0
+  status: 0.0
+  zone_integrity: 85.0  # Start with better infrastructure
+  learning_progress: 0.0
+  time_in_zone: 0
+  productivity: 1.0
+  consumption_rate: 0.4  # REDUCED from 0.5 - eat less
+
+npc_consume:
+  basic_needs_drain: 0.4   # REDUCED from 0.5
+  energy_drain: 1.8        # REDUCED from 2.0
+  health_penalty: 0.02     # Less harsh
+  mood_penalty: 0.008      # Less harsh
+  productivity_decay: 0.97  # Slower decay
+
+npc_work:
+  min_health_factor: 0.3
+  
+  science:
+    learning_multiplier: 0.8
+    knowledge_pool_share: 0.3
+    money_per_base: 0.4       # INCREASED from 0.35
+    status_gain: 0.015
+    knowledge_sell_threshold: 8  # Sell sooner
+    knowledge_sell_amount: 4
+    food_gain: 3              # MORE food when selling knowledge
+    money_gain: 2
+  
+  development:
+    food_multiplier: 5.0      # MASSIVELY INCREASED from 3.5
+    pool_share: 0.95          # Almost all goes to pool
+    money_per_base: 0.25      # INCREASED from 0.2
+    integrity_gain: 2.0       # Faster improvement
+  
+  trade:
+    money_multiplier: 0.7
+    food_multiplier: 1.5      # INCREASED from 1.0 - traders produce food too
+    pool_share: 0.7           # INCREASED from 0.5
+    volatility_decay: 0.95
+  
+  flex:
+    success_threshold: 0.35   # EASIER success
+    influence_gain: 1.5
+    money_gain_success: 1.0   # REDUCED from 1.2
+    money_gain_failure: 0.4   # INCREASED from 0.3
+    status_gain: 0.04
+    food_gain: 0.8            # INCREASED from 0.5
+    mood_penalty: 0.015       # Less harsh
+    integrity_decay: 0.4
+    integrity_min: 65         # Higher floor
+  
+  basic_needs_cap: 20.0       # INCREASED from 15.0
+  mood_gain_threshold: 8
+  mood_gain: 0.025            # Faster mood improvement
+  mood_loss_threshold: 4
+  mood_loss: 0.008            # Less harsh mood loss
+  integrity_decay_non_dev: 0.25
+  integrity_min_non_dev: 65
+
+npc_trade:
+  buy_threshold: 5            # Buy sooner
+  buy_quantity: 4             # Buy more
+  buy_buffer: 3
+  buy_price_multiplier: 1.15  # Less price sensitivity
+  
+  sell_threshold: 12          # Hold more before selling
+  sell_quantity: 4
+  sell_buffer: 10
+  greed_bonus: 0.05           # Less greed
+  
+  donation_threshold: 14
+  donation_quantity: 3
+  donation_buffer: 12
+
+npc_socialize:
+  affinity_change: 0.06
+  mood_boost_base: 0.05       # Better mood from socializing
+  relationship_max: 1.0
+  relationship_min: -1.0
+  
+  rivalry:
+    ambition_threshold: 0.7   # Harder to form rivalries
+    status_diff_threshold: 0.15
+    probability: 0.05         # Less likely
+  
+  sharing:
+    relationship_threshold: 0.6  # Share more easily
+    need_threshold: 4
+    surplus_threshold: 12
+    transfer_amount: 3
+    transfer_buffer: 10
+
+npc_rest:
+  health_recovery: 0.10
+  energy_recovery: 30
+  mood_boost: 0.04
+  emergency_rations: 3.0      # MORE generous
+  emergency_threshold: 4
+
+npc_compete:
+  ambition_threshold: 0.6
+  money_cost: 1.5             # Cheaper competition
+  money_threshold: 8
+  status_gain: 0.04
+  rival_status_loss: 0.015
+  rival_mood_penalty: 0.015
+
+npc_action_utility:
+  work:
+    needs_weight: 0.6         # Prioritize work more
+    money_weight: 0.3
+    industrious_weight: 0.5
+    base_utility: 0.4         # Higher baseline
+  
+  trade:
+    money_weight: 0.4
+    needs_weight: 0.7         # Prioritize food needs
+    surplus_bonus: 0.6
+    surplus_threshold: 12
+  
+  socialize:
+    mood_weight: 0.6
+    social_weight: 0.4
+  
+  rest:
+    health_weight: 0.9
+    energy_weight: 0.006
+  
+  compete:
+    ambition_weight: 0.2      # Less competition
+    status_weight: 0.15
+  
+  emergency:
+    needs_critical: 2.5       # Earlier intervention
+    money_threshold: 3
+  
+  randomness: [-0.03, 0.03]   # Less random
+  
+  targets:
+    needs_comfortable: 8      # Higher comfort threshold
+    money_comfortable: 10
+    mood_comfortable: 0.65
+
+npc_safety_net:
+  threshold: 3.0              # Trigger sooner
+  welfare_multiplier: 0.3     # More generous
+  welfare_max: 4
+
+world_initial:
+  pool:
+    basic_needs: 80.0         # MUCH HIGHER starting pool
+    knowledge: 0.0
+    influence: 0.0
+  
+  prices:
+    basic_needs: 0.8          # Start with cheaper food
+  
+  price_volatility: 1.0
+  transaction_volume: 0
+
+world_generation:
+  base_per_npc: 0.35          # INCREASED from 0.25 - more passive generation
+
+world_prices:
+  supply_buffer: 8
+  demand_buffer: 8
+  ratio_min: 0.5              # Less extreme price swings
+  ratio_max: 2.0
+  smooth_factor: 0.90         # Smoother price changes
+  price_min: 0.5
+  price_max: 2.5              # Lower max price
+
+world_shortage:
+  pool_threshold_multiplier: 3  # More lenient shortage detection
+
+world_taxation:
+  wealth_threshold: 35        # Tax kicks in MUCH sooner
+  tax_rate: 0.12              # HIGHER tax rate
+  food_conversion: 0.8        # More goes to food
+
+world_ubi:
+  money_threshold: 8          # Trigger MUCH sooner
+  needs_threshold: 5
+  money_grant: 4              # DOUBLED
+  needs_grant: 2              # DOUBLED
+
+world_redistribution:
+  pool_critical: 20           # Less strict trigger
+  wealthy_threshold: 12
+  poor_threshold: 5
+  wealthy_count: 3            # Take from more wealthy
+  transfer_amount: 4          # Transfer more
+  transfer_buffer: 10
+
+world_pool_management:
+  overflow_threshold: 120     # Higher before decay
+  decay_factor: 0.98          # Slower decay
+
+world_volatility:
+  decay_factor: 0.96
+
+world_cycles:
+  ticks_per_cycle: 30
+
+rendering:
+  home_position: [0.5, 0.5]
+  home_size: 28
+  npc_radius: 220
+  npc_radius_x: 25
+  npc_radius_y: 18
+  npc_angle_spread: 0.3
+  
+  integrity_bar:
+    width: 40
+    height: 4
+    good_threshold: 75
+    warn_threshold: 60
+  
+  particles:
+    count: 10
+    speed: 0.3
+    alpha_base: 140
+    size_base: 2
+    size_variation: 1.5
+  
+  legend:
+    start_y: 220
+    spacing: 40
+  
+  stats:
+    header_y: 740
+    event_y: 780
+    inequality_y_offset: 50
+
+reporting:
+  inspector:
+    enabled: true
+    trigger: "I"   # key press
+    npc:
+      show:
+        - zone
+        - needs
+        - mood
+        - local_similarity
+        - redundancy_pressure
+    cluster:
+      show:
+        - members
+        - mean_similarity
+        - variance
+        - field_strength
+
+
+
+# Add to int3.yaml
+coherence_system:
+  thresholds:
+    min_members: 5
+    stability_min: 0.75      # Coherence_mean required to emit
+    variance_max: 0.3        # Threshold for field collapse
+  scaling:
+    radius_base: 50.0        # Base pixels
+    radius_per_member: 10.0  # Scales with cluster size
+    strength_cap: 0.85       # Max combined influence
+  modifiers:                 # Passive buffs (Positive only)
+    stress_gain: 0.90        # 10% reduction
+    recovery_rate: 1.15      # 15% boost
+    decision_noise: 0.95     # 5% jitter reduction
+  decay:
+    exit_fade_rate: 0.05     # Gradual modifier loss after leaving
+
+warnings:
+  integrity_threshold: 50
+  shortage_pool_threshold: 10  # Less sensitive
+  price_threshold: 2.0         # Higher threshold
+  starving_threshold: 3        # Less sensitive
+  warning_x: 250
+  warning_y: 220
+  warning_spacing: 25
+
+map:
+  territories:
+    - name: "ZONE 1"
+      center: [0.5, 0.8]
+    - name: "ZONE 2"
+      center: [0.2, 0.2]
+    - name: "ZONE 3"
+      center: [0.8, 0.2]
+
+building_levels:
+  min: 1
+  max: 3
+
+  upgrade_requirements:
+    level_2:
+      time_worked: 300
+      resource_threshold:
+        money: 50
+        integrity: 85
+    level_3:
+      time_worked: 800
+      resource_threshold:
+        money: 150
+        integrity: 95
+
+  reporting:
+  mode: summary        # summary | inspector | debug
+  update_rate_ticks: 30  # Only recompute report once per cycle
+
+  hud:
+    enabled: true
+    show:
+      - world_index
+      - npc_count
+      - zone_distribution
+      - economy_state
+      - coherence_state
+      - warnings_active
+
+  economy_state:
+    derive_from:
+      - world_pool.basic_needs
+      - world_prices.basic_needs
+      - world_shortage.active
+    collapse_to: one_line
+
+  coherence_state:
+    derive_from:
+      - coherence_system.active_fields
+      - coherence_system.avg_strength
+      - coherence_system.max_cluster_size
+    collapse_to: one_line
+
+  suppress_live_logs:
+    - npc_spawn
+    - position_debug
+    - angle_math
+    - per_npc_action_scores
+
+
+  zones:
+    SCIENCE:
+      level_1:
+        learning_multiplier: 0.8
+        money_per_base: 0.4
+        knowledge_pool_share: 0.3
+      level_2:
+        learning_multiplier: 1.0
+        money_per_base: 0.5
+        knowledge_pool_share: 0.4
+        unlock: "Can convert knowledge to influence"
+      level_3:
+        learning_multiplier: 1.3
+        money_per_base: 0.6
+        knowledge_pool_share: 0.5
+        unlock: "Breakthrough events give permanent +10% to all zones"
+
+    DEVELOPMENT:
+      level_1:
+        food_multiplier: 5.0
+        pool_share: 0.95
+        integrity_gain: 2.0
+      level_2:
+        food_multiplier: 6.0
+        pool_share: 0.97
+        integrity_gain: 2.5
+        unlock: "Emergency rations cost 50% less"
+      level_3:
+        food_multiplier: 7.5
+        pool_share: 0.98
+        integrity_gain: 3.0
+        unlock: "Drought events reduced to -15% production"
+
+    TRADE:
+      level_1:
+        money_multiplier: 0.7
+        food_multiplier: 1.5
+        pool_share: 0.7
+      level_2:
+        money_multiplier: 0.9
+        food_multiplier: 1.8
+        pool_share: 0.75
+        unlock: "Price volatility reduced by 50%"
+      level_3:
+        money_multiplier: 1.2
+        food_multiplier: 2.2
+        pool_share: 0.8
+        unlock: "Can trade resources between territories"
+
+    FLEX:
+      level_1:
+        success_threshold: 0.35
+        money_gain_success: 1.0
+        food_gain: 0.8
+      level_2:
+        success_threshold: 0.30
+        money_gain_success: 1.4
+        food_gain: 1.1
+        unlock: "Failed attempts give 50% resource return"
+      level_3:
+        success_threshold: 0.25
+        money_gain_success: 2.0
+        food_gain: 1.5
+        unlock: "Can trigger positive events (5% chance per cycle)"
+
+      reporting:
+        debug:
+          enabled: false
+          file: "debug.log"
